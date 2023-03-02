@@ -30,6 +30,7 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
         updateOxygen();
         ImageButton imageButton = root.findViewById(R.id.iBClicker);
         alive = true;

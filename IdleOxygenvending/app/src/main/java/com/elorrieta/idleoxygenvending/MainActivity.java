@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.elorrieta.idleoxygenvending.Database.AppDatabase;
+import com.elorrieta.idleoxygenvending.Entities.Usuario;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.FullScreenContentCallback;
@@ -24,11 +26,16 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.room.Room;
 
 import com.elorrieta.idleoxygenvending.databinding.ActivityMainBinding;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.Month;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "IdleOxygen").allowMainThreadQueries().build();
+
+        //db.UsuarioDao().insertAll(new Usuario(1, (float) 1.2,null,1,1));
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
