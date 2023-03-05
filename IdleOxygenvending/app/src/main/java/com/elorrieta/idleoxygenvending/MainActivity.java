@@ -49,9 +49,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "IdleOxygen").allowMainThreadQueries().build();
-
+        AppDatabase db =   AppDatabase.getDatabase(getApplicationContext());
         //db.UsuarioDao().insertAll(new Usuario(1, (float) 1.2,null,1,1));
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
