@@ -20,46 +20,68 @@ public class HomeFragment extends Fragment {
     TextView tVOxigen;
 
     private FragmentHomeBinding binding;
-    private Thread hilo;
-    private static volatile boolean alive;
 
+    View root;
+
+
+    private Thread hilo;
+
+    private static volatile boolean alive;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
-
         binding = FragmentHomeBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+       root = binding.getRoot();
 
-        updateOxygen();
         ImageButton imageButton = root.findViewById(R.id.iBClicker);
-        alive = true;
+
         imageButton.setOnClickListener(v -> {
             MainActivity.oxygen +=1;
         });
+        alive=true;
+        updateOxygen();
         return root;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        hilo.interrupt();
         binding = null;
-        alive = false;
+        alive=false;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        alive=false;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        alive=true;
+        updateOxygen();
     }
 
     private  void updateOxygen(){
-        View view = binding.getRoot();
-        tVOxigen = view.findViewById(R.id.tVOxygen);
 
-       hilo= new Thread(){
+        tVOxigen = root.findViewById(R.id.tVOxygen);
+
+        hilo= new Thread(){
             @Override
             public void run() {
                 do{
                     tVOxigen.setText("O2: "+ Math.round(MainActivity.oxygen));
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }while (alive);
             }
         };
-       hilo.start();
+        hilo.start();
     }
+
 }
