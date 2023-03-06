@@ -20,21 +20,20 @@ public class HomeFragment extends Fragment {
     TextView tVOxigen;
 
     private FragmentHomeBinding binding;
-
     View root;
 
-
+    HomeViewModel homeViewModel;
     private Thread hilo;
 
     private static volatile boolean alive;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel =
+        homeViewModel=
                 new ViewModelProvider(this).get(HomeViewModel.class);
-        binding = FragmentHomeBinding.inflate(inflater, container, false);
-       root = binding.getRoot();
 
-        ImageButton imageButton = root.findViewById(R.id.iBClicker);
+       binding = FragmentHomeBinding.inflate(inflater, container, false);
+       root = binding.getRoot();
+       ImageButton imageButton = root.findViewById(R.id.iBClicker);
 
         imageButton.setOnClickListener(v -> {
             MainActivity.user.setOxygenQuantity(MainActivity.user.getOxygenQuantity()+1);
@@ -64,15 +63,13 @@ public class HomeFragment extends Fragment {
         updateOxygen();
     }
 
-    private  void updateOxygen(){
-
+    public void updateOxygen(){
         tVOxigen = root.findViewById(R.id.tVOxygen);
-
         hilo= new Thread(){
             @Override
             public void run() {
                 do{
-                    tVOxigen.setText("O2: "+ Math.round(MainActivity.user.getOxygenQuantity()));
+                    tVOxigen.setText("O2: " + Math.round(MainActivity.user.getOxygenQuantity()));
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {

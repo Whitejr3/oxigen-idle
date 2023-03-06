@@ -41,36 +41,4 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(binding.navView, navController);
     }
 
-       /* btn.setOnClickListener(v -> {
-            MobileAds.initialize(this, new OnInitializationCompleteListener() {
-                @Override
-                public void onInitializationComplete(InitializationStatus initializationStatus) {
-                    AdRequest adRequest = new AdRequest.Builder().build();
-                    String id = getResources().getString(R.string.id_ads2);
-                    System.out.println(id);
-                    InterstitialAd.load(getApplicationContext(),id, adRequest,
-                            new InterstitialAdLoadCallback() {
-                                @Override
-                                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                                    // The mInterstitialAd reference will be null until
-                                    // an ad is loaded.
-                                    mInterstitialAd = interstitialAd;
-                                    Log.i("TAG", "onAdLoaded");
-                                }
-
-                                @Override
-                                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                                    // Handle the error
-                                    Log.d("TAG", loadAdError.toString());
-                                    mInterstitialAd = null;
-                                }
-                            });
-                    if (mInterstitialAd != null) {
-                        mInterstitialAd.show(MainActivity.this);
-                    } else {
-                        Log.d("TAG", "The interstitial ad wasn't ready yet.");
-                    }
-                }
-            });
-        });*/
 }
