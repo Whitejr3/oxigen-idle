@@ -17,9 +17,9 @@ import java.util.concurrent.Executors;
 @Database(entities = {Usuario.class, Mejora.class, MejoraPorUser.class}, version = 1)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
-    public abstract UsuarioDao UsuarioDao();
-    public abstract MejoraDao MejoraDao();
-    public abstract MejoraPorUsuarioDao MejoraPorUsuarioDao();
+    public abstract UsuarioDao usuarioDao();
+    public abstract MejoraDao mejoraDao();
+    public abstract MejoraPorUsuarioDao mejoraPorUsuarioDao();
 
     private static volatile AppDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
@@ -31,8 +31,8 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                                    AppDatabase.class, "DidaktikAppDB.db")
-                            .createFromAsset("DidaktikAppDB.db")
+                                    AppDatabase.class, "IdleOxygenVending.db")
+                            //.createFromAsset("DidaktikAppDB.db")
                             .allowMainThreadQueries()
                             .build();
                 }

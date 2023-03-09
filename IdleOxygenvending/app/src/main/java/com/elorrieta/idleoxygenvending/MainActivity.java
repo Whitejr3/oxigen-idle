@@ -8,6 +8,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.elorrieta.idleoxygenvending.Database.AppDatabase;
 import com.elorrieta.idleoxygenvending.Entities.Usuario;
 import com.elorrieta.idleoxygenvending.databinding.ActivityMainBinding;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
@@ -24,8 +25,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         user = new Usuario();
         user.setOxygenQuantity(0);
-        // AppDatabase db =   AppDatabase.getDatabase(getApplicationContext());
-        //db.UsuarioDao().insertAll(new Usuario(1, (float) 1.2,null,1,1));
+        AppDatabase db =   AppDatabase.getDatabase(getApplicationContext());
+        Usuario usuario = new Usuario(1,  1000,null,1,1);
+        MainActivity.user = usuario;
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

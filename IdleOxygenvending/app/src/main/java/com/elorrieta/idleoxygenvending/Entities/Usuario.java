@@ -4,6 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import com.elorrieta.idleoxygenvending.MainActivity;
+import com.google.android.gms.dynamic.IFragmentWrapper;
+
 import java.sql.Date;
 
 
@@ -12,7 +15,7 @@ public class Usuario {
     @PrimaryKey @NonNull
     int id;
 
-    float OxygenQuantity;
+    int OxygenQuantity;
 
     Date last_conn_time;
 
@@ -20,7 +23,7 @@ public class Usuario {
 
     int prestige_points;
 
-    public Usuario(int id, float oxygenQuantity, Date last_conn_time, int prestige_lvl, int prestige_points) {
+    public Usuario(int id, int oxygenQuantity, Date last_conn_time, int prestige_lvl, int prestige_points) {
         this.id = id;
         OxygenQuantity = oxygenQuantity;
         this.last_conn_time = last_conn_time;
@@ -40,12 +43,25 @@ public class Usuario {
         this.id = id;
     }
 
-    public float getOxygenQuantity() {
+    public int getOxygenQuantity() {
         return OxygenQuantity;
     }
 
-    public void setOxygenQuantity(float oxygenQuantity) {
-        OxygenQuantity = oxygenQuantity;
+    public void setOxygenQuantity(int oxygenQuantity) {
+        if(MainActivity.user!=null){
+            OxygenQuantity = MainActivity.user.OxygenQuantity + oxygenQuantity;
+        }
+
+    }
+
+    public String showOxygenQuantity(){
+        String oxygenQuantity;
+        if(MainActivity.user!=null){
+            oxygenQuantity ="O2: " + (float)MainActivity.user.getOxygenQuantity()/1000;
+        }else {
+            return "Desconocido";
+        }
+        return oxygenQuantity;
     }
 
     public Date getLast_conn_time() {

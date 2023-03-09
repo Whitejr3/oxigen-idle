@@ -36,7 +36,7 @@ public class HomeFragment extends Fragment {
        ImageButton imageButton = root.findViewById(R.id.iBClicker);
 
         imageButton.setOnClickListener(v -> {
-            MainActivity.user.setOxygenQuantity(MainActivity.user.getOxygenQuantity()+1);
+            MainActivity.user.setOxygenQuantity(1000);
         });
         alive=true;
         updateOxygen();
@@ -69,7 +69,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void run() {
                 do{
-                    tVOxigen.setText("O2: " + Math.round(MainActivity.user.getOxygenQuantity()));
+                    MainActivity.user.setOxygenQuantity(1/100);
+                    tVOxigen.setText(MainActivity.user.showOxygenQuantity());
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
