@@ -17,8 +17,6 @@
         android:theme="@style/Theme.IdleOxygenVending"
         tools:targetApi="31" >
 
-
-
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/id_ads" />

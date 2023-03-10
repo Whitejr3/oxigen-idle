@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "365916840517",
+    "project_id": "idle-oxygen-vending",
+    "storage_bucket": "idle-oxygen-vending.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:365916840517:android:6a94370255fa0edb4f392c",
+        "android_client_info": {
+          "package_name": "com.elorrieta.idleoxygenvending"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "365916840517-p3eh0sq1tskc12mactl20ahbts9ufqm5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy7taFKcJPaRc3gCOPyZO7GiHmMWS35hQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "365916840517-bhvjab9b7tb8r2dn3jq04i52engb4eg9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
