@@ -29,8 +29,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        user = new Usuario();
-        user.setOxygenQuantity(0);
         AppDatabase db =   AppDatabase.getDatabase(getApplicationContext());
         db.close();
         Usuario usuario = new Usuario(1,  1000,null,1,1);

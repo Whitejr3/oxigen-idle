@@ -68,7 +68,7 @@ public class LoadingActivity extends AppCompatActivity {
 
             }
         }.start();
-      //  mAuth = FirebaseAuth.getInstance(); para recuperar la instancia de la cuenta que se ha logueado
+        mAuth = FirebaseAuth.getInstance(); //para recuperar la instancia de la cuenta que se ha logueado
     }
 
     /*Despues de lanzar el intenta para que se logue el usuario con google auth
