@@ -12,4 +12,8 @@
     <string name="next_level">Next Level</string>
     <string name="interstitial_ad_unit_id">ca-app-pub-3940256099942544/1033173712</string>
     <string name="web_client_id">365916840517-p3eh0sq1tskc12mactl20ahbts9ufqm5.apps.googleusercontent.com</string>
+    <string name="nameSpaceSharedPreferences">MiPreferencia</string>
+    <string name="key1">gmail</string>
+    <string name="key2">google</string>
+    <string name="firstLogin">firstLogin</string>
 </resources>
