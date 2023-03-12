@@ -30,8 +30,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         AppDatabase db =   AppDatabase.getDatabase(getApplicationContext());
-        db.close();
         Usuario usuario = new Usuario(1,  1000,null,1,1);
+        //db.usuarioDao().insertAll(usuario);
         MainActivity.user = usuario;
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());

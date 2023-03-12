@@ -32,7 +32,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     AppDatabase.class, "IdleOxygenVending.db")
-                            //.createFromAsset("DidaktikAppDB.db")
+                            .createFromAsset("IdleOxygen.db")
                             .allowMainThreadQueries()
                             .build();
                 }
