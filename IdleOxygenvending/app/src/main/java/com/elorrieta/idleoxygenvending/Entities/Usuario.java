@@ -128,7 +128,7 @@ public class Usuario {
     public void createAccount(Context context) {
         int id;
         String email;
-        Usuario usuario;
+        Usuario usuario = null;
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.nameSpaceSharedPreferences), MODE_PRIVATE);
         email =sharedPreferences.getString(context.getString(R.string.key1),"");
         id = Firebase.userExists(email,context);
@@ -142,6 +142,7 @@ public class Usuario {
         }else{
             usuario = Firebase.cargarUsuario(id,context);
         }
+        MainActivity.user = usuario;
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(context.getString(R.string.keyID),id);
         editor.apply();
