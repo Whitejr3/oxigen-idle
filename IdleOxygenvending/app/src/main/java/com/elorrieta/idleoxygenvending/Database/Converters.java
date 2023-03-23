@@ -2,7 +2,7 @@ package com.elorrieta.idleoxygenvending.Database;
 
 import androidx.room.TypeConverter;
 
-import java.sql.Date;
+import java.util.Date;
 
 public class Converters {
 

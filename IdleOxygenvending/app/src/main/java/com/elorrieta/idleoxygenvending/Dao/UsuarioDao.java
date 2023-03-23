@@ -23,7 +23,7 @@ public interface UsuarioDao {
     @Query("SELECT * FROM Usuario")
     List<Usuario> getAll();
 
-    @Query("Update Usuario set OxygenQuantity = :OxygenQuantity,last_conn_time = :last_conn_time,prestige_lvl = :prestige_lvl,prestige_points = :prestige_points WHERE id = :id")
-    void update(int id, int OxygenQuantity, String last_conn_time,int prestige_lvl,int prestige_points);
+    @Query("Update Usuario set oxygenQuantity = :oxygenQuantity, email=:email, last_conn_time = :last_conn_time,prestige_lvl = :prestige_lvl,prestige_points = :prestige_points WHERE id = :id")
+    void update(int id,String email, int oxygenQuantity, String last_conn_time,int prestige_lvl,int prestige_points);
 }
 

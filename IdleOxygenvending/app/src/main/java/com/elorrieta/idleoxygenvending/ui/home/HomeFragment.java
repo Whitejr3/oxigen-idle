@@ -1,6 +1,7 @@
 package com.elorrieta.idleoxygenvending.ui.home;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,14 +19,11 @@ import com.elorrieta.idleoxygenvending.databinding.FragmentHomeBinding;
 public class HomeFragment extends Fragment {
 
     TextView tVOxigen;
-
     private FragmentHomeBinding binding;
     View root;
-
     HomeViewModel homeViewModel;
-    private Thread hilo;
+    private Handler handler = new Handler();
 
-    private static volatile boolean alive;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel=
@@ -38,7 +36,6 @@ public class HomeFragment extends Fragment {
         imageButton.setOnClickListener(v -> {
             MainActivity.user.setOxygenQuantity(1000);
         });
-        alive=true;
         updateOxygen();
         return root;
     }
@@ -47,39 +44,30 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-        alive=false;
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        alive=false;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        alive=true;
         updateOxygen();
     }
 
     public void updateOxygen(){
         tVOxigen = root.findViewById(R.id.tVOxygen);
-        hilo= new Thread(){
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                do{
-                    MainActivity.user.setOxygenQuantity(1/100);
-                    tVOxigen.setText(MainActivity.user.showOxygenQuantity());
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }while (alive);
+                tVOxigen.setText(MainActivity.user.showOxygenQuantity());
+
+                handler.postDelayed(this, 100);
             }
-        };
-        hilo.start();
+        }, 100);
+
     }
 
 }

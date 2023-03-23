@@ -16,4 +16,12 @@
     <string name="key1">gmail</string>
     <string name="key2">google</string>
     <string name="firstLogin">firstLogin</string>
+    <string name="firebase_table_usuario">Usuario</string>
+    <string name="firebase_id_usuario">id</string>
+    <string name="firebase_email_usuario">email</string>
+    <string name="firebase_oxygenQuantity_usuario">oxygenQuantity</string>
+    <string name="firebase_last_conn_time_usuario">last_conn_time</string>
+    <string name="firebase_prestige_lvl_usuario">prestige_lvl</string>
+    <string name="firebase_prestige_points_usuario">prestige_points</string>
+    <string name="keyID">id_Usuario_Logueado</string>
 </resources>

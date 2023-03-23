@@ -3,6 +3,8 @@ package com.elorrieta.idleoxygenvending;
 import static android.content.ContentValues.TAG;
 
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +14,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.elorrieta.idleoxygenvending.Database.AppDatabase;
+import com.elorrieta.idleoxygenvending.Database.Firebase;
 import com.elorrieta.idleoxygenvending.Entities.Usuario;
 import com.elorrieta.idleoxygenvending.databinding.ActivityMainBinding;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
@@ -29,8 +32,22 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent data = getIntent();
+        if(data.getExtras()!=null){
+            if(data.getExtras().getString(getString(R.string.firstLogin),"false").equals("true")){
+                //If de user is new them create account else the user connect with old account with this email
+                //user.createAccount(getBaseContext());
+                System.out.println("True");
+            }
+
+        }else{
+            //Todo cargar los datos del usuario ya logueado y calcular el oxigeno obtenido en el tiempo fuera del juego
+            System.out.println("Inicio correcto");
+            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.nameSpaceSharedPreferences),MODE_PRIVATE);
+            Firebase.cargarUsuario(sharedPreferences.getInt(getString(R.string.keyID),-1),getBaseContext());
+        }
         AppDatabase db =   AppDatabase.getDatabase(getApplicationContext());
-        Usuario usuario = new Usuario(1,  1000,null,1,1);
+        Usuario usuario = new Usuario(1,1000,"",null,1,1);
         //db.usuarioDao().insertAll(usuario);
         MainActivity.user = usuario;
         binding = ActivityMainBinding.inflate(getLayoutInflater());

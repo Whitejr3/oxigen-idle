@@ -117,6 +117,7 @@ public class LoadingActivity extends AppCompatActivity {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
 
                         }
+
                     }
                 });
     }
@@ -130,7 +131,7 @@ public class LoadingActivity extends AppCompatActivity {
         editor.putBoolean(getString(R.string.key2), googleAuth);
         editor.apply();
         Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
-        intent.putExtra(getString(R.string.firstLogin), true);
+        intent.putExtra(getString(R.string.firstLogin), "true");
         startActivity(intent);
     }
 
