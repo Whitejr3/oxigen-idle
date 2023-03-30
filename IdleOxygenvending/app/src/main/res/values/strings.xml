@@ -16,7 +16,7 @@
     <string name="key1">gmail</string>
     <string name="key2">google</string>
     <string name="firstLogin">firstLogin</string>
-    <string name="firebase_table_usuario">Usuario</string>
+    <string name="firebase_table_usuario">usuario</string>
     <string name="firebase_id_usuario">id</string>
     <string name="firebase_email_usuario">email</string>
     <string name="firebase_oxygenQuantity_usuario">oxygenQuantity</string>

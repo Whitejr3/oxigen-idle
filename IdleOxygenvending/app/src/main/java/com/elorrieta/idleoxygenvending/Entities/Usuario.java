@@ -13,6 +13,8 @@ import androidx.room.PrimaryKey;
 import com.elorrieta.idleoxygenvending.MainActivity;
 import com.elorrieta.idleoxygenvending.Database.Firebase;
 import com.elorrieta.idleoxygenvending.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.time.Instant;
@@ -56,10 +58,10 @@ public class Usuario {
     public Usuario(QueryDocumentSnapshot document) {
         this.id = Integer.parseInt(document.getId());
         this.email= document.getString("email");
-        this.oxygenQuantity =  Integer.parseInt(Objects.requireNonNull(document.getString("oxygenQuantity")));
+        this.oxygenQuantity = Long.bitCount((Long) document.get("oxygenQuantity"));
         this.last_conn_time = document.getDate("last_conn_time");
-        this.prestige_lvl = Integer.parseInt(Objects.requireNonNull(document.getString("prestige_lvl")));
-        this.prestige_points = Integer.parseInt(Objects.requireNonNull(document.getString("prestige_points")));
+        this.prestige_lvl = Long.bitCount((Long) (document.get("prestige_lvl")));
+        this.prestige_points =  Long.bitCount((Long) document.get("prestige_points"));
    }
 
     public int getId() {
@@ -126,26 +128,27 @@ public class Usuario {
     //Si el correo es "" se crea una nueva cuenta
     //Si el correo existe se le cargaran los datos
     public void createAccount(Context context) {
-        int id;
-        String email;
+        int id,index;
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         Usuario usuario = null;
-        SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.nameSpaceSharedPreferences), MODE_PRIVATE);
-        email =sharedPreferences.getString(context.getString(R.string.key1),"");
-        id = Firebase.userExists(email,context);
-        //no existe hay que crearlo
-        if(id==-1){
+
+        id = Firebase.userExists(currentUser.getEmail(),context);
+        //no existe hay que crearloA
+
+        if(id==0){
             id = Firebase.getLastId(context);
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                usuario = new Usuario(id,0,email,Date.from(Instant.now()),0,0);
+                index = id+1;
+                usuario = new Usuario(index,0,currentUser.getEmail(),Date.from(Instant.now()),0,0);
                 Firebase.createUsusario(usuario,context);
             }
         }else{
             usuario = Firebase.cargarUsuario(id,context);
         }
         MainActivity.user = usuario;
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt(context.getString(R.string.keyID),id);
-        editor.apply();
+
     }
 }
 

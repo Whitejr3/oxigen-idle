@@ -24,11 +24,16 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 
 public class Firebase {
     private static FirebaseFirestore db;
     private static  boolean result= true ;
-    private static int id = 0;
+    private static int id ;
+
+    private static int lastId;
     private static ArrayList<Event> events = new ArrayList<Event>();
     private static String userName ="";
     private static Event eventChange ;
@@ -53,39 +58,56 @@ public class Firebase {
 
                     }
                 });
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         if(user[0] == null){
-            user[0] = new Usuario(1,1000,"",null,1,1);
+            user[0] = new Usuario(1,0000,"",null,0,0);
         }
         return user[0];
     }
 
     public static int userExists(String email, Context context) {
-        final int[] id = {-1};
         db = FirebaseFirestore.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
         db.collection(context.getString(R.string.firebase_table_usuario))
+
                 .whereEqualTo(context.getString(R.string.firebase_email_usuario), email)
+                .limit(1)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                id[0] = Integer.getInteger(document.getId());
+                                if (document.getId()!=null){
+                                    id= Integer.parseInt(document.getId());
+                                }else {
+                                    id = 0;
+                                }
                                 break;
                             }
+
                         }
+                        latch.countDown();
 
                     }
                 });
-        return id[0];
+        try {
+            latch.await(10, TimeUnit.SECONDS); // Espera hasta 10 segundos para obtener el resultado
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return id;
 
     }
 
     public static int getLastId(Context context) {
-        final int[] id = {-1};
         db = FirebaseFirestore.getInstance();
+        final CountDownLatch latch = new CountDownLatch(1);
         db.collection(context.getString(R.string.firebase_table_usuario))
-                .limitToLast(1)
                 .orderBy(context.getString(R.string.firebase_id_usuario), Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -93,16 +115,21 @@ public class Firebase {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                id[0] = Integer.getInteger(document.getId());
+                                lastId = Integer.parseInt(document.getId());
                                 break;
                             }
+
                         }
+                        latch.countDown();
 
                     }
                 });
-
-       int i = id[0]+1;
-        return i;
+        try {
+            latch.await(10, TimeUnit.SECONDS); // Espera hasta 10 segundos para obtener el resultado
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+       return lastId;
     }
 
     public static void createUsusario(Usuario usuario,Context context) {

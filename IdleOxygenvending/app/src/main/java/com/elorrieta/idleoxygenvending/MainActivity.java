@@ -20,6 +20,7 @@ import com.elorrieta.idleoxygenvending.databinding.ActivityMainBinding;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,25 +34,27 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent data = getIntent();
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        AppDatabase db =   AppDatabase.getDatabase(getApplicationContext());
+        Usuario usuario = new Usuario(1,0000,"",null,0,0);
+        //db.usuarioDao().insertAll(usuario);
+        MainActivity.user = usuario;
+
         if(data.getExtras()!=null){
             if(data.getExtras().getString(getString(R.string.firstLogin),"false").equals("true")){
                 //If de user is new them create account else the user connect with old account with this email
-                //user.createAccount(getBaseContext());
-                System.out.println("True");
+                user.createAccount(getBaseContext());
+                FirebaseAuth user = FirebaseAuth.getInstance();
+                System.out.println(user.getCurrentUser().getEmail());
             }
 
         }else{
             //Todo cargar los datos del usuario ya logueado y calcular el oxigeno obtenido en el tiempo fuera del juego
             System.out.println("Inicio correcto");
             SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.nameSpaceSharedPreferences),MODE_PRIVATE);
-            Firebase.cargarUsuario(sharedPreferences.getInt(getString(R.string.keyID),-1),getBaseContext());
+            MainActivity.user =  Firebase.cargarUsuario(sharedPreferences.getInt(getString(R.string.keyID),-1),getBaseContext());
         }
-        AppDatabase db =   AppDatabase.getDatabase(getApplicationContext());
-        Usuario usuario = new Usuario(1,1000,"",null,1,1);
-        //db.usuarioDao().insertAll(usuario);
-        MainActivity.user = usuario;
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
