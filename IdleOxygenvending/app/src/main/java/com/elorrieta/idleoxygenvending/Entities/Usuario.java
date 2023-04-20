@@ -8,6 +8,7 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.elorrieta.idleoxygenvending.MainActivity;
@@ -38,6 +39,12 @@ public class Usuario {
     int prestige_lvl;
 
     int prestige_points;
+
+    @Ignore
+    volatile boolean exist;
+
+    @Ignore
+    volatile boolean running =true;
 
 
 
@@ -124,28 +131,52 @@ public class Usuario {
         this.prestige_points = prestige_points;
     }
 
+    @Override
+    public String toString() {
+        return "Usuario{" +
+                "id=" + id +
+                ", oxygenQuantity=" + oxygenQuantity +
+                ", email='" + email + '\'' +
+                ", last_conn_time=" + last_conn_time +
+                ", prestige_lvl=" + prestige_lvl +
+                ", prestige_points=" + prestige_points +
+                ", exist=" + exist +
+                ", running=" + running +
+                '}';
+    }
+
     //Crea una cuenta nueva en caso de que no exista ninguna ya con ese correo
     //Si el correo es "" se crea una nueva cuenta
     //Si el correo existe se le cargaran los datos
     public void createAccount(Context context) {
         int id,index;
+
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         Usuario usuario = null;
+        System.out.println("Inicio creacion "+currentUser.getEmail());
+        Firebase.userExists(currentUser.getEmail(),context);
 
-        id = Firebase.userExists(currentUser.getEmail(),context);
-        //no existe hay que crearloA
+        System.out.println(MainActivity.user.toString());
+        //no existe hay que crearlo
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        if(exist){
+            System.out.println("P3");
+            usuario = Firebase.cargarUsuario(currentUser.getEmail(),context);
 
-        if(id==0){
-            id = Firebase.getLastId(context);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                index = id+1;
-                usuario = new Usuario(index,0,currentUser.getEmail(),Date.from(Instant.now()),0,0);
-                Firebase.createUsusario(usuario,context);
-            }
         }else{
-            usuario = Firebase.cargarUsuario(id,context);
+            id = Firebase.getLastId(context);
+            System.out.println("P1");
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                System.out.println("P2");
+
+                usuario = new Usuario(id,0,currentUser.getEmail(),Date.from(Instant.now()),0,0);
+                Firebase.createUsuario(usuario,context);
+            }
         }
         MainActivity.user = usuario;
 

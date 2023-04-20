@@ -1,19 +1,25 @@
 package com.elorrieta.idleoxygenvending.Database;
 
 
+import static androidx.fragment.app.FragmentManager.TAG;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.metrics.Event;
+import android.util.Log;
 
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.elorrieta.idleoxygenvending.Entities.Usuario;
+import com.elorrieta.idleoxygenvending.MainActivity;
 import com.elorrieta.idleoxygenvending.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -30,8 +36,10 @@ import java.util.concurrent.TimeUnit;
 
 public class Firebase {
     private static FirebaseFirestore db;
-    private static  boolean result= true ;
+    private static  boolean result ;
     private static int id ;
+
+    private static Usuario usuario;
 
     private static int lastId;
     private static ArrayList<Event> events = new ArrayList<Event>();
@@ -40,11 +48,11 @@ public class Firebase {
 
 
     /*Recupera un usuario por el correo*/
-    public static Usuario cargarUsuario(int id,Context context){
+    public static Usuario cargarUsuario(String email,Context context){
         final Usuario[] user = new Usuario[1];
         db = FirebaseFirestore.getInstance();
         db.collection(context.getString(R.string.firebase_table_usuario))
-                .whereEqualTo(context.getString(R.string.firebase_id_usuario), id)
+                .whereEqualTo(context.getString(R.string.firebase_email_usuario), email)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -69,12 +77,10 @@ public class Firebase {
         return user[0];
     }
 
-    public static int userExists(String email, Context context) {
+    public static void userExists(String email, Context context) {
         db = FirebaseFirestore.getInstance();
-        final CountDownLatch latch = new CountDownLatch(1);
         db.collection(context.getString(R.string.firebase_table_usuario))
-
-                .whereEqualTo(context.getString(R.string.firebase_email_usuario), email)
+                .whereEqualTo("email",email)
                 .limit(1)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -82,25 +88,19 @@ public class Firebase {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                if (document.getId()!=null){
-                                    id= Integer.parseInt(document.getId());
-                                }else {
-                                    id = 0;
-                                }
-                                break;
+                                MainActivity.user = new Usuario(document);
                             }
-
                         }
-                        latch.countDown();
-
                     }
                 });
+
         try {
-            latch.await(10, TimeUnit.SECONDS); // Espera hasta 10 segundos para obtener el resultado
+            Thread.sleep(500);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
-        return id;
+
+
 
     }
 
@@ -120,19 +120,13 @@ public class Firebase {
                             }
 
                         }
-                        latch.countDown();
-
                     }
                 });
-        try {
-            latch.await(10, TimeUnit.SECONDS); // Espera hasta 10 segundos para obtener el resultado
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
        return lastId;
     }
 
-    public static void createUsusario(Usuario usuario,Context context) {
+    public static void createUsuario(Usuario usuario,Context context) {
         Map<String,Object> user =new HashMap<>();
         user.put(context.getString(R.string.firebase_id_usuario), usuario.getId());
         user.put(context.getString(R.string.firebase_oxygenQuantity_usuario), usuario.getOxygenQuantity());
@@ -155,4 +149,6 @@ public class Firebase {
                     }
                 });
     }
+
+
 }
