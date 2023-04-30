@@ -1,17 +1,13 @@
 package com.elorrieta.idleoxygenvending.Database;
 
 
-import static androidx.fragment.app.FragmentManager.TAG;
+import static com.elorrieta.idleoxygenvending.MainActivity.lastId;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.media.metrics.Event;
-import android.util.Log;
-
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
+import com.elorrieta.idleoxygenvending.Entities.Mejora;
 import com.elorrieta.idleoxygenvending.Entities.Usuario;
 import com.elorrieta.idleoxygenvending.MainActivity;
 import com.elorrieta.idleoxygenvending.R;
@@ -19,36 +15,26 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 
 public class Firebase {
     private static FirebaseFirestore db;
-    private static  boolean result ;
-    private static int id ;
-
-    private static Usuario usuario;
-
-    private static int lastId;
-    private static ArrayList<Event> events = new ArrayList<Event>();
-    private static String userName ="";
-    private static Event eventChange ;
 
 
     /*Recupera un usuario por el correo*/
-    public static Usuario cargarUsuario(String email,Context context){
+    public static Usuario cargarUsuario(String email, Context context) {
         final Usuario[] user = new Usuario[1];
         db = FirebaseFirestore.getInstance();
         db.collection(context.getString(R.string.firebase_table_usuario))
@@ -71,8 +57,8 @@ public class Firebase {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        if(user[0] == null){
-            user[0] = new Usuario(1,0000,"",null,0,0);
+        if (user[0] == null) {
+            user[0] = new Usuario(1, 0000, "", null, 0, 0);
         }
         return user[0];
     }
@@ -80,7 +66,7 @@ public class Firebase {
     public static void userExists(String email, Context context) {
         db = FirebaseFirestore.getInstance();
         db.collection(context.getString(R.string.firebase_table_usuario))
-                .whereEqualTo("email",email)
+                .whereEqualTo("email", email)
                 .limit(1)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -89,24 +75,30 @@ public class Firebase {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 MainActivity.user = new Usuario(document);
+
+                            }
+                            if(MainActivity.user.getId()==-1){
+                                FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                                FirebaseUser currentUser = mAuth.getCurrentUser();
+                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                                    Usuario usuario = new Usuario(lastId, 0, currentUser.getEmail(), Date.from(Instant.now()), 0, 0);
+                                    createUsuario(usuario,context);
+                                }
                             }
                         }
                     }
                 });
-
         try {
-            Thread.sleep(500);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-
-
     }
 
-    public static int getLastId(Context context) {
+    public static void getLastId(Context context) {
+        lastId = -1;
         db = FirebaseFirestore.getInstance();
-        final CountDownLatch latch = new CountDownLatch(1);
         db.collection(context.getString(R.string.firebase_table_usuario))
                 .orderBy(context.getString(R.string.firebase_id_usuario), Query.Direction.DESCENDING)
                 .get()
@@ -115,19 +107,20 @@ public class Firebase {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                lastId = Integer.parseInt(document.getId());
+                                lastId = Integer.parseInt(document.getId()) + 1;
+                                System.out.println(document.getId());
                                 break;
+
                             }
 
                         }
                     }
                 });
 
-       return lastId;
     }
 
-    public static void createUsuario(Usuario usuario,Context context) {
-        Map<String,Object> user =new HashMap<>();
+    public static void createUsuario(Usuario usuario, Context context) {
+        Map<String, Object> user = new HashMap<>();
         user.put(context.getString(R.string.firebase_id_usuario), usuario.getId());
         user.put(context.getString(R.string.firebase_oxygenQuantity_usuario), usuario.getOxygenQuantity());
         user.put(context.getString(R.string.firebase_email_usuario), usuario.getEmail());
@@ -151,4 +144,27 @@ public class Firebase {
     }
 
 
+    public static void createMejora(Mejora mejora, Context context) {
+        Map<String, Object> mejoras = new HashMap<>();
+        mejoras.put(context.getString(R.string.firebase_id_mejora), mejora.getId());
+        mejoras.put(context.getString(R.string.firebase_nombre_mejora), mejora.getNombre());
+        mejoras.put(context.getString(R.string.firebase_descripcion_mejora), mejora.getDescripcion());
+        mejoras.put(context.getString(R.string.firebase_o2ps_mejora), mejora.getO2ps());
+        mejoras.put(context.getString(R.string.firebase_baseprice_mejora), mejora.getBaseprice());
+
+
+
+        db.collection("mejoras").document(String.valueOf(mejora.getId()))
+                .set(mejora)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                    }
+                });
+    }
 }

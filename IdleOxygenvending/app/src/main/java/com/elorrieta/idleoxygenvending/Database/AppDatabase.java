@@ -1,6 +1,7 @@
 package com.elorrieta.idleoxygenvending.Database;
 import android.content.Context;
 
+
 import androidx.room.*;
 import androidx.room.RoomDatabase;
 
@@ -14,9 +15,12 @@ import com.elorrieta.idleoxygenvending.Entities.Usuario;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Usuario.class, Mejora.class, MejoraPorUser.class}, version = 1)
+@Database(entities = {Usuario.class, Mejora.class, MejoraPorUser.class}, version = 2)
 @TypeConverters({Converters.class})
+
 public abstract class AppDatabase extends RoomDatabase {
+
+
     public abstract UsuarioDao usuarioDao();
     public abstract MejoraDao mejoraDao();
     public abstract MejoraPorUsuarioDao mejoraPorUsuarioDao();
@@ -31,9 +35,11 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                                    AppDatabase.class, "IdleOxygenVending.db")
-                            .createFromAsset("IdleOxygen.db")
+                                    AppDatabase.class, "IdleOxygenDatabase")
+                            .createFromAsset("database/IdleOxygen.db")
+                            .fallbackToDestructiveMigration()
                             .allowMainThreadQueries()
+                            .enableMultiInstanceInvalidation()
                             .build();
                 }
             }

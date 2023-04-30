@@ -10,6 +10,10 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.elorrieta.idleoxygenvending.Database.AppDatabase;
+import com.elorrieta.idleoxygenvending.Database.Firebase;
+import com.elorrieta.idleoxygenvending.Entities.Mejora;
+import com.elorrieta.idleoxygenvending.Entities.Usuario;
 import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -26,6 +30,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import java.util.List;
 
 
 public class LoadingActivity extends AppCompatActivity {
@@ -53,6 +59,7 @@ public class LoadingActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser!=null){
             findViewById(R.id.google_sign).setVisibility(View.INVISIBLE);
+            Firebase.cargarUsuario(currentUser.getEmail(),getApplicationContext());
             new CountDownTimer(time, 3000) {
                 public void onTick(long millisUntilFinished) {
                     // Actualizar la UI con el tiempo restante
@@ -65,7 +72,14 @@ public class LoadingActivity extends AppCompatActivity {
                 }
             }.start();
         }
+        new Thread(){
+            @Override
+            public void run() {
 
+                Firebase.getLastId(getApplicationContext());
+                Mejora.cargarDatos(getApplicationContext());
+            }
+        }.run();
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()

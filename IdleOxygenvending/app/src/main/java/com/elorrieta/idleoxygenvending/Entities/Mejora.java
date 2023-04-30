@@ -1,8 +1,17 @@
 package com.elorrieta.idleoxygenvending.Entities;
 
+
+
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
+
+import com.elorrieta.idleoxygenvending.Database.AppDatabase;
+import com.elorrieta.idleoxygenvending.MainActivity;
+import java.util.List;
+
 @Entity
 public class Mejora {
 
@@ -66,5 +75,13 @@ public class Mejora {
 
     public void setBaseprice(int baseprice) {
         this.baseprice = baseprice;
+    }
+
+    public static void cargarDatos(Context context){
+        AppDatabase room = AppDatabase.getDatabase(context);
+
+
+        List<Mejora> mejoras = room.mejoraDao().getAll();
+        MainActivity.mejoras = mejoras;
     }
 }

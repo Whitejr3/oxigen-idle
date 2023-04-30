@@ -15,6 +15,8 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.elorrieta.idleoxygenvending.Database.AppDatabase;
 import com.elorrieta.idleoxygenvending.Database.Firebase;
+import com.elorrieta.idleoxygenvending.Entities.Mejora;
+import com.elorrieta.idleoxygenvending.Entities.MejoraPorUser;
 import com.elorrieta.idleoxygenvending.Entities.Usuario;
 import com.elorrieta.idleoxygenvending.databinding.ActivityMainBinding;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
@@ -23,12 +25,20 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
 
-    public static volatile Usuario user;
+    public static volatile Usuario user= new Usuario();
+    public static volatile int lastId;
     private ActivityMainBinding binding;
     private InterstitialAd mInterstitialAd;
+
+    public static volatile List<Mejora> mejoras;
+
+    private static volatile  List<MejoraPorUser> mejoraspDelUsuario;
 
 
     @Override
@@ -37,26 +47,23 @@ public class MainActivity extends AppCompatActivity {
         Intent data = getIntent();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        AppDatabase db =   AppDatabase.getDatabase(getApplicationContext());
-        Usuario usuario = new Usuario(1,0000,"",null,0,0);
-        //db.usuarioDao().insertAll(usuario);
-        MainActivity.user = usuario;
-
         if(data.getExtras()!=null){
             if(data.getExtras().getString(getString(R.string.firstLogin),"false").equals("true")){
                 //If de user is new them create account else the user connect with old account with this email
-                user.createAccount(getApplicationContext());
-                FirebaseAuth user = FirebaseAuth.getInstance();
-                System.out.println(user.getCurrentUser().getEmail());
+                user.loadAccount(getApplicationContext());
+                FirebaseAuth userAuth = FirebaseAuth.getInstance();
+                System.out.println(userAuth.getCurrentUser().getEmail());
+
             }
 
-        }else{
-            //Todo cargar los datos del usuario ya logueado y calcular el oxigeno obtenido en el tiempo fuera del juego
-            System.out.println("Inicio correcto");
-            FirebaseAuth mAuth = FirebaseAuth.getInstance();
-            FirebaseUser currentUser = mAuth.getCurrentUser();
-            MainActivity.user =  Firebase.cargarUsuario(currentUser.getEmail(),getApplicationContext());
         }
+
+        for (int i = 0; i < mejoras.size() ; i++) {
+            Firebase.createMejora(mejoras.get(i),getApplicationContext());
+        }
+        System.out.println(mejoras.size());
+        System.out.println(user.getOxygenQuantity()+ user.getEmail());
+
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.

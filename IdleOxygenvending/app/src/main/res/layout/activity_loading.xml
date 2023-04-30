@@ -20,9 +20,9 @@
 
     <Button
         android:id="@+id/google_sign"
-        android:layout_width="202dp"
-        android:layout_height="106dp"
-        android:backgroundTint="@color/purple_200"
+        android:layout_width="169dp"
+        android:layout_height="55dp"
+        android:backgroundTint="?android:attr/colorPrimary"
         android:text="Google"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

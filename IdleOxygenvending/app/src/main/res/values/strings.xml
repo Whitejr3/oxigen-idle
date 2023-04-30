@@ -24,4 +24,9 @@
     <string name="firebase_prestige_lvl_usuario">prestige_lvl</string>
     <string name="firebase_prestige_points_usuario">prestige_points</string>
     <string name="keyID">id_Usuario_Logueado</string>
+    <string name="firebase_id_mejora">id</string>
+    <string name="firebase_nombre_mejora">nombre</string>
+    <string name="firebase_descripcion_mejora">descripcion</string>
+    <string name="firebase_o2ps_mejora">o2ps</string>
+    <string name="firebase_baseprice_mejora">baseprice</string>
 </resources>
