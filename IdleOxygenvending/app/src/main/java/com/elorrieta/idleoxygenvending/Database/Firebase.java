@@ -32,35 +32,45 @@ import java.util.Map;
 public class Firebase {
     private static FirebaseFirestore db;
 
+    private static Usuario usuario;
+
 
     /*Recupera un usuario por el correo*/
-    public static Usuario cargarUsuario(String email, Context context) {
-        final Usuario[] user = new Usuario[1];
+    public static void cargarUsuario(String email, Context context) {
         db = FirebaseFirestore.getInstance();
-        db.collection(context.getString(R.string.firebase_table_usuario))
-                .whereEqualTo(context.getString(R.string.firebase_email_usuario), email)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                user[0] = new Usuario(document);
-                                break;
-                            }
-                        }
+        Thread thread = new Thread() {
 
-                    }
-                });
+            @Override
+            public void run() {
+                db.collection(context.getString(R.string.firebase_table_usuario))
+                        .whereEqualTo(context.getString(R.string.firebase_email_usuario), email)
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        MainActivity.user = new Usuario(document);
+                                        break;
+                                    }
+                                }
+
+                            }
+                        });
+            }
+
+
+        };
+        thread.run();
         try {
-            Thread.sleep(300);
+            thread.join();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        if (user[0] == null) {
-            user[0] = new Usuario(1, 0000, "", null, 0, 0);
+
+        if (MainActivity.user == null) {
+            MainActivity.user = new Usuario(1, 0000, "", null, 0, 0);
         }
-        return user[0];
     }
 
     public static void userExists(String email, Context context) {

@@ -5,6 +5,7 @@ import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +32,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
 
-    public static volatile Usuario user= new Usuario();
+    public static volatile Usuario user = new Usuario();
     public static volatile int lastId;
     private ActivityMainBinding binding;
     private InterstitialAd mInterstitialAd;
@@ -46,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Intent data = getIntent();
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        System.out.println(user.toString());
         setContentView(binding.getRoot());
         if(data.getExtras()!=null){
             if(data.getExtras().getString(getString(R.string.firstLogin),"false").equals("true")){
@@ -54,15 +56,12 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseAuth userAuth = FirebaseAuth.getInstance();
                 System.out.println(userAuth.getCurrentUser().getEmail());
 
+            }else{
+                System.out.println(user.getEmail()+"email logueado 2");
             }
 
         }
-
-        for (int i = 0; i < mejoras.size() ; i++) {
-            Firebase.createMejora(mejoras.get(i),getApplicationContext());
-        }
-        System.out.println(mejoras.size());
-        System.out.println(user.getOxygenQuantity()+ user.getEmail());
+        System.out.println(user.toString());
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each

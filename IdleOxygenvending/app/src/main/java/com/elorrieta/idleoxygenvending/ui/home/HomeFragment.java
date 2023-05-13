@@ -62,9 +62,13 @@ public class HomeFragment extends Fragment {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                tVOxigen.setText(MainActivity.user.showOxygenQuantity());
+                if(MainActivity.user!=null){
+                    tVOxigen.setText(MainActivity.user.showOxygenQuantity());
 
-                handler.postDelayed(this, 100);
+                    handler.postDelayed(this, 100);
+                }
+
+
             }
         }, 100);
 

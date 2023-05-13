@@ -44,6 +44,8 @@ public class LoadingActivity extends AppCompatActivity {
     private GoogleSignInOptions gso;
     private SharedPreferences sharedPreferences;
 
+    private static FirebaseUser currentUser;
+
     /*Este metodo crea el layout y pone en cuenta a un cronometro que si se acaba pasa al MainActivity
     * Por otro lado comprueba que haya inciado sesion alguna vez y si tiene una cuenta ya guardada
     * Si el usuario tiene la cuenta solo tiene que esperar 5 segundos y vuelve al juego
@@ -56,10 +58,22 @@ public class LoadingActivity extends AppCompatActivity {
         FirebaseApp.initializeApp(getApplicationContext());
         sharedPreferences = getSharedPreferences(getString(R.string.nameSpaceSharedPreferences), MODE_PRIVATE);
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+        currentUser = mAuth.getCurrentUser();
         if(currentUser!=null){
             findViewById(R.id.google_sign).setVisibility(View.INVISIBLE);
-            Firebase.cargarUsuario(currentUser.getEmail(),getApplicationContext());
+
+            Thread thread = new Thread(){
+                @Override
+                public void run() {
+                  Firebase.cargarUsuario(currentUser.getEmail(),getApplicationContext());
+                }
+            };
+            thread.run();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             new CountDownTimer(time, 3000) {
                 public void onTick(long millisUntilFinished) {
                     // Actualizar la UI con el tiempo restante
@@ -71,27 +85,35 @@ public class LoadingActivity extends AppCompatActivity {
                         finish();
                 }
             }.start();
+        }else{
+            Thread thread = new Thread(){
+                @Override
+                public void run() {
+
+                    Firebase.getLastId(getApplicationContext());
+                    Mejora.cargarDatos(getApplicationContext());
+                }
+            };
+            thread.run();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.default_web_client_id))
+                    .requestEmail()
+                    .build();
+            gsc = GoogleSignIn.getClient(this, gso);
+
+            findViewById(R.id.google_sign).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    signIn();
+                }
+            });
         }
-        new Thread(){
-            @Override
-            public void run() {
 
-                Firebase.getLastId(getApplicationContext());
-                Mejora.cargarDatos(getApplicationContext());
-            }
-        }.run();
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
-        gsc = GoogleSignIn.getClient(this, gso);
-
-        findViewById(R.id.google_sign).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                signIn();
-            }
-        });
 
     }
     private void signIn() {
