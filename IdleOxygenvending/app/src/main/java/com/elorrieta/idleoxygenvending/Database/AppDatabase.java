@@ -15,7 +15,7 @@ import com.elorrieta.idleoxygenvending.Entities.Usuario;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Usuario.class, Mejora.class, MejoraPorUser.class}, version = 2)
+@Database(entities = {Usuario.class, Mejora.class, MejoraPorUser.class}, version = 3)
 @TypeConverters({Converters.class})
 
 public abstract class AppDatabase extends RoomDatabase {

@@ -6,17 +6,93 @@
     android:layout_height="match_parent"
     tools:context=".ui.dashboard.DashboardFragment">
 
-    <TextView
-        android:id="@+id/text_dashboard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
+    <ScrollView
+        android:id="@+id/mejoras_scroll"
+        android:layout_width="388dp"
+        android:layout_height="623dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.153"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.583">
+
+        <LinearLayout
+            android:id="@+id/mejoras_layout_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/mejoraDiseño"
+                android:layout_width="match_parent"
+                android:layout_height="188dp">
+
+                <ImageView
+                    android:id="@+id/iV"
+                    android:layout_width="130dp"
+                    android:layout_height="119dp"
+                    android:layout_marginStart="4dp"
+                    android:src="@drawable/tree"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.507" />
+
+                <TextView
+                    android:id="@+id/tVNombre"
+                    android:layout_width="101dp"
+                    android:layout_height="51dp"
+                    android:layout_marginStart="144dp"
+                    android:layout_marginTop="16dp"
+                    android:text="Nombre"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tVPrecio"
+                    android:layout_width="118dp"
+                    android:layout_height="94dp"
+                    android:layout_marginStart="140dp"
+                    android:layout_marginBottom="24dp"
+                    android:text="Precio"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <TextView
+                    android:id="@+id/tVNivel"
+                    android:layout_width="52dp"
+                    android:layout_height="25dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="48dp"
+                    android:text="Nivel"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/tVO2ps"
+                    android:layout_width="103dp"
+                    android:layout_height="55dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="02ps"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.503" />
+
+                <Button
+                    android:id="@+id/BtnMejora"
+                    android:layout_width="134dp"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="32dp"
+                    android:layout_marginBottom="16dp"
+                    android:text="Mejora"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,10 +1,13 @@
 package com.elorrieta.idleoxygenvending.ui.home;
 
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -35,6 +38,11 @@ public class HomeFragment extends Fragment {
 
         imageButton.setOnClickListener(v -> {
             MainActivity.user.setOxygenQuantity(1000);
+            Animation animation = AnimationUtils.loadAnimation(root.getContext(),R.anim.pop);
+            imageButton.setAnimation(animation);
+            imageButton.startAnimation(animation);
+
+
         });
         updateOxygen();
         return root;

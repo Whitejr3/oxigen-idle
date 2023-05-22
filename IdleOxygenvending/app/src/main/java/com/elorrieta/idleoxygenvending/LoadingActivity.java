@@ -10,11 +10,7 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.elorrieta.idleoxygenvending.Database.AppDatabase;
 import com.elorrieta.idleoxygenvending.Database.Firebase;
-import com.elorrieta.idleoxygenvending.Entities.Mejora;
-import com.elorrieta.idleoxygenvending.Entities.Usuario;
-import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -31,75 +27,58 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.util.List;
-
 
 public class LoadingActivity extends AppCompatActivity {
 
     private static final String TAG = "GoogleActivity";
     private static final int RC_SIGN_IN = 9001;
+    private static FirebaseUser currentUser;
     private FirebaseAuth mAuth;
     private GoogleSignInClient gsc;
-
     private GoogleSignInOptions gso;
     private SharedPreferences sharedPreferences;
 
-    private static FirebaseUser currentUser;
-
     /*Este metodo crea el layout y pone en cuenta a un cronometro que si se acaba pasa al MainActivity
-    * Por otro lado comprueba que haya inciado sesion alguna vez y si tiene una cuenta ya guardada
-    * Si el usuario tiene la cuenta solo tiene que esperar 5 segundos y vuelve al juego
-    * Sino le salta google auth para que inicie sesion y si no lo hace entra con una cuenta nueva*/
+     * Por otro lado comprueba que haya inciado sesion alguna vez y si tiene una cuenta ya guardada
+     * Si el usuario tiene la cuenta solo tiene que esperar 5 segundos y vuelve al juego
+     * Sino le salta google auth para que inicie sesion y si no lo hace entra con una cuenta nueva*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        int time = 8000;
+        int time = 5000;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
         FirebaseApp.initializeApp(getApplicationContext());
         sharedPreferences = getSharedPreferences(getString(R.string.nameSpaceSharedPreferences), MODE_PRIVATE);
         mAuth = FirebaseAuth.getInstance();
         currentUser = mAuth.getCurrentUser();
-        if(currentUser!=null){
+        if (currentUser != null) {
             findViewById(R.id.google_sign).setVisibility(View.INVISIBLE);
 
-            Thread thread = new Thread(){
+            Thread Carganormal = new Thread() {
                 @Override
                 public void run() {
-                  Firebase.cargarUsuario(currentUser.getEmail(),getApplicationContext());
+                    Firebase.cargarUsuario(currentUser.getEmail(), getApplicationContext());
                 }
             };
-            thread.run();
+            Carganormal.start();
             try {
-                thread.join();
+                Carganormal.join();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            new CountDownTimer(time, 3000) {
+            new CountDownTimer(time, 1000) {
                 public void onTick(long millisUntilFinished) {
                     // Actualizar la UI con el tiempo restante
 
                 }
+
                 public void onFinish() {
-                        Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finish();
+                    Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
             }.start();
-        }else{
-            Thread thread = new Thread(){
-                @Override
-                public void run() {
-
-                    Firebase.getLastId(getApplicationContext());
-                    Mejora.cargarDatos(getApplicationContext());
-                }
-            };
-            thread.run();
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        } else {
             gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestIdToken(getString(R.string.default_web_client_id))
                     .requestEmail()
@@ -112,10 +91,25 @@ public class LoadingActivity extends AppCompatActivity {
                     signIn();
                 }
             });
+            Thread primeraSesion = new Thread() {
+                @Override
+                public void run() {
+                    Firebase.getLastId(getApplicationContext());
+                    Firebase.cargarMejoras(getApplicationContext());
+                }
+            };
+            primeraSesion.start();
+
+            try {
+                primeraSesion.join();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+
         }
-
-
     }
+
     private void signIn() {
         Intent signInIntent = gsc.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -124,7 +118,7 @@ public class LoadingActivity extends AppCompatActivity {
 
     /*Despues de lanzar el intenta para que se logue el usuario con google auth
      *Empieza esta funcion que llama a la funcion firebaseAuthwithGoogle*/
-   @Override
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -135,7 +129,7 @@ public class LoadingActivity extends AppCompatActivity {
             try {
 
                 // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account =  task.getResult(ApiException.class);
+                GoogleSignInAccount account = task.getResult(ApiException.class);
                 Log.d(TAG, "firebaseAuthWithGoogle:" + account.getId());
                 firebaseAuthWithGoogle(account.getIdToken());
             } catch (ApiException e) {
@@ -166,7 +160,7 @@ public class LoadingActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                       // Log.w(TAG, "signInWithCredential:failure", task.getException());
+                        // Log.w(TAG, "signInWithCredential:failure", task.getException());
                     }
                 })
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -177,21 +171,5 @@ public class LoadingActivity extends AppCompatActivity {
                 });
 
     }
-
-    //Se puede usar si queremos que se registre tambien con un correo y contraseña pero solo para google play no hace falta
-/*
-    *//*Guarda con SharedPreferences el correo del usuario y si se ha registrado con google o no
-     * 1 Si el usuario se registrar con google auth se guarda su correo y el booleano a true
-     * 2 Si el usuario no se registra con google auth, se guarda el correo como cadena vacia y el booleano a false*//*
-    private void saveData(String gmail, Boolean googleAuth) {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(getString(R.string.key1), gmail);
-        editor.putBoolean(getString(R.string.key2), googleAuth);
-        editor.apply();
-        Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
-        intent.putExtra(getString(R.string.firstLogin), "true");
-        startActivity(intent);
-        finish();
-    }*/
 
 }

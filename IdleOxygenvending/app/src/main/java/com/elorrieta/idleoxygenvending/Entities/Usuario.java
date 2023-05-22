@@ -9,11 +9,11 @@ import androidx.room.PrimaryKey;
 
 import com.elorrieta.idleoxygenvending.Database.Firebase;
 import com.elorrieta.idleoxygenvending.MainActivity;
+import com.elorrieta.idleoxygenvending.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.time.Instant;
 import java.util.Date;
 
 
@@ -45,19 +45,20 @@ public class Usuario {
         this.prestige_points = prestige_points;
 
     }
+
     @Ignore
     public Usuario() {
-    this.id = -1;
+        this.id = -1;
     }
 
     @Ignore
-    public Usuario(QueryDocumentSnapshot document) {
-        this.id = Integer.parseInt(document.getId());
-        this.email = document.getString("email");
-        this.oxygenQuantity = Integer.parseInt(document.get("oxygenQuantity").toString());
-        this.last_conn_time = document.getDate("last_conn_time");
-        this.prestige_lvl = Integer.parseInt(document.get("prestige_lvl").toString());
-        this.prestige_points = Integer.parseInt(document.get("prestige_points").toString());
+    public Usuario(QueryDocumentSnapshot document, Context context) {
+        this.id = Integer.parseInt(document.get(context.getString(R.string.firebase_id_usuario)).toString());
+        this.email = document.getString(context.getString(R.string.firebase_email_usuario));
+        this.oxygenQuantity = Integer.parseInt(document.get(context.getString(R.string.firebase_oxygenQuantity_usuario)).toString());
+        this.last_conn_time = document.getDate(context.getString(R.string.firebase_last_conn_time_usuario));
+        this.prestige_lvl = Integer.parseInt(document.get(context.getString(R.string.firebase_prestige_lvl_usuario)).toString());
+        this.prestige_points = Integer.parseInt(document.get(context.getString(R.string.firebase_prestige_points_usuario)).toString());
     }
 
     public int getId() {
@@ -140,32 +141,34 @@ public class Usuario {
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        System.out.println("Inicio creacion " + currentUser.getEmail());
-        new Thread() {
+        Thread thread = new Thread() {
             @Override
             public void run() {
                 Firebase.userExists(currentUser.getEmail(), context);
+
             }
-        }.run();
-
-        //no existe hay que crearlo
-      /*  if(exist){
-            System.out.println("P3");
-            usuario = Firebase.cargarUsuario(currentUser.getEmail(),context);
-
-        }else{
-            id = Firebase.getLastId(context);
-            System.out.println("P1");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                System.out.println("P2");
-
-                usuario = new Usuario(id,0,currentUser.getEmail(),Date.from(Instant.now()),0,0);
-                Firebase.createUsuario(usuario,context);
-            }
+        };
+        thread.start();
+        try {
+            thread.join();
+            Thread.sleep(2500);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        MainActivity.user = usuario;*/
 
     }
 
+    public int getO2ps(){
+        int result =-1;
+        if(MainActivity.mejorasDelUsuario!=null){
+            result=0;
+            for (int i = 0; i < MainActivity.mejorasDelUsuario.size(); i++) {
+                if(MainActivity.mejorasDelUsuario.get(i).getUpgrade_Amount()>0){
+                    result+=(MainActivity.mejorasDelUsuario.get(i).getUpgrade_Amount()*MainActivity.mejoras.get(i).getO2ps());
+                }
+            }
+        }
+        return result;
+    }
 }
 

@@ -4,10 +4,12 @@ package com.elorrieta.idleoxygenvending.Database;
 import static com.elorrieta.idleoxygenvending.MainActivity.lastId;
 
 import android.content.Context;
+import android.os.Build;
 
 import androidx.annotation.NonNull;
 
 import com.elorrieta.idleoxygenvending.Entities.Mejora;
+import com.elorrieta.idleoxygenvending.Entities.MejoraPorUser;
 import com.elorrieta.idleoxygenvending.Entities.Usuario;
 import com.elorrieta.idleoxygenvending.MainActivity;
 import com.elorrieta.idleoxygenvending.R;
@@ -23,9 +25,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -42,26 +44,23 @@ public class Firebase {
 
             @Override
             public void run() {
-                db.collection(context.getString(R.string.firebase_table_usuario))
-                        .whereEqualTo(context.getString(R.string.firebase_email_usuario), email)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        MainActivity.user = new Usuario(document);
-                                        break;
-                                    }
-                                }
-
+                db.collection(context.getString(R.string.firebase_table_usuario)).whereEqualTo(context.getString(R.string.firebase_email_usuario), email).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                MainActivity.user = new Usuario(document, context);
+                                break;
                             }
-                        });
+                        }
+
+                    }
+                });
             }
 
 
         };
-        thread.run();
+        thread.start();
         try {
             thread.join();
         } catch (InterruptedException e) {
@@ -75,60 +74,76 @@ public class Firebase {
 
     public static void userExists(String email, Context context) {
         db = FirebaseFirestore.getInstance();
-        db.collection(context.getString(R.string.firebase_table_usuario))
-                .whereEqualTo("email", email)
-                .limit(1)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        Thread thread = new Thread() {
+
+            @Override
+            public void run() {
+                db.collection(context.getString(R.string.firebase_table_usuario)).whereEqualTo("email", email).limit(1).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                MainActivity.user = new Usuario(document);
-
+                                MainActivity.user = new Usuario(document, context);
+                                cargarMejorasPorUsuario(context);
                             }
-                            if(MainActivity.user.getId()==-1){
+                            if (MainActivity.user.getId() == -1) {
                                 FirebaseAuth mAuth = FirebaseAuth.getInstance();
                                 FirebaseUser currentUser = mAuth.getCurrentUser();
-                                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                                    Usuario usuario = new Usuario(lastId, 0, currentUser.getEmail(), Date.from(Instant.now()), 0, 0);
-                                    createUsuario(usuario,context);
+                                Usuario usuario = null;
+
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                    usuario = new Usuario(lastId, 0, currentUser.getEmail(), Date.from(Instant.now()), 0, 0);
+                                    createUsuario(usuario, context);
+                                    MainActivity.user = usuario;
+                                    for (int i = 0; i < MainActivity.mejoras.size(); i++) {
+                                        MejoraPorUser mejoraPorUser = new MejoraPorUser(lastId, MainActivity.mejoras.get(i).getId(), 0);
+                                        Firebase.createMejoraPorUsuario(mejoraPorUser, context);
+                                        AppDatabase room = AppDatabase.getDatabase(context);
+                                        room.mejoraPorUsuarioDao().insertAll(mejoraPorUser);
+                                    }
+
                                 }
+
+
                             }
+
                         }
                     }
                 });
+            }
+        };
         try {
-            Thread.sleep(2000);
+            thread.start();
+            thread.join();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
 
     }
 
     public static void getLastId(Context context) {
         lastId = -1;
         db = FirebaseFirestore.getInstance();
-        db.collection(context.getString(R.string.firebase_table_usuario))
-                .orderBy(context.getString(R.string.firebase_id_usuario), Query.Direction.DESCENDING)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                lastId = Integer.parseInt(document.getId()) + 1;
-                                System.out.println(document.getId());
-                                break;
+        db.collection(context.getString(R.string.firebase_table_usuario)).orderBy(context.getString(R.string.firebase_id_usuario), Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        lastId = Integer.parseInt(document.getId()) + 1;
+                        System.out.println(document.getId());
+                        break;
 
-                            }
-
-                        }
                     }
-                });
+
+                }
+            }
+        });
 
     }
 
+    /*El metodo createUsuario sirve tanto para crear un usuario como para modificar uno que ya exista , si el id no existe crea el usuario
+    * y si existe lo modifica con los nuevos datos*/
     public static void createUsuario(Usuario usuario, Context context) {
         Map<String, Object> user = new HashMap<>();
         user.put(context.getString(R.string.firebase_id_usuario), usuario.getId());
@@ -139,18 +154,15 @@ public class Firebase {
         user.put(context.getString(R.string.firebase_prestige_points_usuario), usuario.getPrestige_points());
 
 
-        db.collection("usuario").document(String.valueOf(usuario.getId()))
-                .set(user)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                    }
-                });
+        db.collection("usuario").document(String.valueOf(usuario.getId())).set(user).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+            }
+        });
     }
 
 
@@ -163,18 +175,135 @@ public class Firebase {
         mejoras.put(context.getString(R.string.firebase_baseprice_mejora), mejora.getBaseprice());
 
 
+        db.collection(context.getString(R.string.firebase_table_mejoras)).document(String.valueOf(mejora.getId())).set(mejora).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+            }
+        });
+    }
 
-        db.collection("mejoras").document(String.valueOf(mejora.getId()))
-                .set(mejora)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+    public static void createMejoraPorUsuario(MejoraPorUser mejoraPorUser, Context context) {
+        Map<String, Object> mejoras = new HashMap<>();
+        String id = mejoraPorUser.getIdUsuario() + " " + mejoraPorUser.getIdMejora();
+        mejoras.put(context.getString(R.string.firebase_idusuario_mejoraporusuario), mejoraPorUser.getIdUsuario());
+        mejoras.put(context.getString(R.string.firebase_idmejora_mejoraporusuario), mejoraPorUser.getIdMejora());
+        mejoras.put(context.getString(R.string.firebase_nivel_mejoraporusuario), mejoraPorUser.getUpgrade_Amount());
+
+
+        Thread thread = new Thread() {
+
+            @Override
+            public void run() {
+                db.collection(context.getString(R.string.firebase_table_mejoras_por_user)).document(id).set(mejoras).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                     }
-                })
-                .addOnFailureListener(new OnFailureListener() {
+                }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                     }
                 });
+            }
+
+
+        };
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    public static void cargarMejoras(Context context) {
+        db = FirebaseFirestore.getInstance();
+        Thread thread = new Thread() {
+
+            @Override
+            public void run() {
+                db.collection(context.getString(R.string.firebase_table_mejoras)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            AppDatabase room = AppDatabase.getDatabase(context);
+                            boolean noEstaLaMejora;
+                            List<Mejora> mejorasActuales = room.mejoraDao().getAll();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Mejora mejora = new Mejora(document, context);
+                                noEstaLaMejora = true;
+                                for (Mejora actual : mejorasActuales) {
+                                    if (actual.getId() == mejora.getId()) {
+                                        noEstaLaMejora = false;
+                                        return;
+                                    }
+                                }
+                                if (noEstaLaMejora) {
+                                    room.mejoraDao().insertAll(mejora);
+                                }
+                            }
+
+                        }
+
+                    }
+                });
+            }
+
+
+        };
+        thread.start();
+        try {
+            thread.join(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void cargarMejorasPorUsuario(Context context) {
+        db = FirebaseFirestore.getInstance();
+        Thread thread = new Thread() {
+
+            @Override
+            public void run() {
+                db.collection(context.getString(R.string.firebase_table_mejoras_por_user)).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            AppDatabase room = AppDatabase.getDatabase(context);
+                            boolean noEstaLaMejoraPorUsuario;
+                            List<MejoraPorUser> mejorasActuales = room.mejoraPorUsuarioDao().getAll();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                MejoraPorUser mejora = new MejoraPorUser(document, context);
+                                noEstaLaMejoraPorUsuario = true;
+                                for (MejoraPorUser actual : mejorasActuales) {
+                                    if (actual.getIdUsuario() == mejora.getIdUsuario() && actual.getIdMejora() == mejora.getIdMejora()) {
+                                        noEstaLaMejoraPorUsuario = false;
+                                        return;
+                                    }
+                                }
+                                if (noEstaLaMejoraPorUsuario && MainActivity.user.getId() == mejora.getIdUsuario()) {
+                                    room.mejoraPorUsuarioDao().insertAll(mejora);
+                                }
+                            }
+                            MejoraPorUser.cargarDatos(context);
+
+                        }
+
+                    }
+                });
+            }
+
+
+        };
+        thread.start();
+        try {
+            thread.join(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

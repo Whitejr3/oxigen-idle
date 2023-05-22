@@ -6,35 +6,50 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.elorrieta.idleoxygenvending.Database.AppDatabase;
 import com.elorrieta.idleoxygenvending.MainActivity;
+import com.elorrieta.idleoxygenvending.R;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.List;
 
 @Entity
 public class Mejora {
 
     @PrimaryKey @NonNull
-    int id;
+    private int id;
 
-    String nombre;
+    private String nombre;
 
-    String descripcion;
+    private String descripcion;
 
-    float O2ps;
+    private int o2ps;
 
-    int baseprice;
+    private int baseprice;
 
+    @Ignore
     public Mejora() {
     }
 
-    public Mejora(int id, String nombre, String descripcion, float o2ps, int baseprice) {
+    public Mejora(int id, String nombre, String descripcion, int o2ps, int baseprice) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
-        O2ps = o2ps;
+        this.o2ps = o2ps;
         this.baseprice = baseprice;
+    }
+
+    @Ignore
+    public Mejora(QueryDocumentSnapshot document, Context context) {
+        this.id = Integer.parseInt(document.get(context.getString(R.string.firebase_id_mejora)).toString());
+        this.nombre = document.getString(context.getString(R.string.firebase_nombre_mejora));
+        this.descripcion = document.getString(context.getString(R.string.firebase_descripcion_mejora));
+        this.o2ps =  Integer.parseInt(document.get(context.getString(R.string.firebase_o2ps_mejora)).toString());
+        this.baseprice = Integer.parseInt(document.get(context.getString(R.string.firebase_baseprice_mejora)).toString());
+
     }
 
     public int getId() {
@@ -61,12 +76,20 @@ public class Mejora {
         this.descripcion = descripcion;
     }
 
-    public float getO2ps() {
-        return O2ps;
+    public int getO2ps() {
+        return o2ps;
     }
 
-    public void setO2ps(float o2ps) {
-        O2ps = o2ps;
+    public String showO2ps() {
+        String o2ps="";
+        if (MainActivity.mejoras != null) {
+            o2ps = "+ "+String.valueOf((float) getO2ps() / 1000) +" O2/s";
+        }
+        return o2ps;
+    }
+
+    public void setO2ps(int o2ps) {
+        this.o2ps = o2ps;
     }
 
     public int getBaseprice() {
@@ -76,12 +99,59 @@ public class Mejora {
     public void setBaseprice(int baseprice) {
         this.baseprice = baseprice;
     }
-
+    @Ignore
     public static void cargarDatos(Context context){
         AppDatabase room = AppDatabase.getDatabase(context);
-
-
         List<Mejora> mejoras = room.mejoraDao().getAll();
         MainActivity.mejoras = mejoras;
     }
+    @Ignore
+    public int getPrice(int index){
+        int result=-1;
+        if(MainActivity.mejorasDelUsuario!=null){
+            result=0;
+            if(MainActivity.mejorasDelUsuario.get(index).getUpgrade_Amount()==0){
+                result=baseprice;
+            }else{
+                for (int i = 0; i <MainActivity.mejorasDelUsuario.get(index).getUpgrade_Amount() ; i++) {
+                    if (MainActivity.mejorasDelUsuario.get(index).getUpgrade_Amount()%5==0){
+                        result= (int) ((result+(baseprice*1.35)));
+                    }else{
+                        result= (int) ((result+(baseprice*1.25)));
+                    }
+
+                }
+            }
+        }
+        return result;
+    }
+    @Ignore
+    public String showPrice(int index){
+        String price;
+        if (MainActivity.mejoras != null) {
+            price = "precio: "+String.valueOf((float) getPrice(index) / 1000) +" O2";
+        } else {
+            return "Desconocido";
+        }
+        return price;
+    }
+    @Ignore
+    public int getO2psTotal(int index){
+        int o2ps=0;
+        if (MainActivity.mejorasDelUsuario != null) {
+            o2ps = MainActivity.mejorasDelUsuario.get(index).getUpgrade_Amount()*getO2ps();
+        }
+        return o2ps;
+    }
+    @Ignore
+    public String showO2psTotal(int index){
+        String o2ps;
+        if (MainActivity.mejoras != null) {
+            o2ps = String.valueOf((float) getO2psTotal(index) / 1000) +" O2/s";
+        } else {
+            return "Desconocido";
+        }
+        return o2ps;
+    }
+
 }

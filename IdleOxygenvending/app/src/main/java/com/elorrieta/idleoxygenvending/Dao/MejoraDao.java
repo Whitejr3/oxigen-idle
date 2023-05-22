@@ -8,8 +8,7 @@ import androidx.room.Query;
 
 import com.elorrieta.idleoxygenvending.Entities.Mejora;
 
-import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.List;
 
 @Dao
