@@ -72,6 +72,11 @@ public class Firebase {
         }
     }
 
+
+    //Compruebe si el usuario existe en Firebase
+    //Si existe se guarda en una variable en el Main
+    //Si no existe crea el nuevo usuario con el nuevo ultimo id que genera otra queary
+    //Y crea las relaciones de las mejoras por usuario en Firebase y lo guarda en Room
     public static void userExists(String email, Context context) {
         db = FirebaseFirestore.getInstance();
         Thread thread = new Thread() {
@@ -122,6 +127,8 @@ public class Firebase {
 
     }
 
+    //Recoge el ultimo id de la talba usuarios en firebase y asigna ese valor +1 a una variable en el main
+    //Para gestionar bien la creacion de un nuevo usuario
     public static void getLastId(Context context) {
         lastId = -1;
         db = FirebaseFirestore.getInstance();
@@ -143,7 +150,7 @@ public class Firebase {
     }
 
     /*El metodo createUsuario sirve tanto para crear un usuario como para modificar uno que ya exista , si el id no existe crea el usuario
-    * y si existe lo modifica con los nuevos datos*/
+     * y si existe lo modifica con los nuevos datos*/
     public static void createUsuario(Usuario usuario, Context context) {
         Map<String, Object> user = new HashMap<>();
         user.put(context.getString(R.string.firebase_id_usuario), usuario.getId());
@@ -166,6 +173,7 @@ public class Firebase {
     }
 
 
+    //Crea una mejora en Firebase o la modifica
     public static void createMejora(Mejora mejora, Context context) {
         Map<String, Object> mejoras = new HashMap<>();
         mejoras.put(context.getString(R.string.firebase_id_mejora), mejora.getId());
@@ -186,6 +194,7 @@ public class Firebase {
         });
     }
 
+    //Crea una mejora por usuario o la modifica en Firebase
     public static void createMejoraPorUsuario(MejoraPorUser mejoraPorUser, Context context) {
         Map<String, Object> mejoras = new HashMap<>();
         String id = mejoraPorUser.getIdUsuario() + " " + mejoraPorUser.getIdMejora();
@@ -219,6 +228,7 @@ public class Firebase {
         }
     }
 
+    //Recoge las mejoras que hay en Firebase y las guarda en Room
     public static void cargarMejoras(Context context) {
         db = FirebaseFirestore.getInstance();
         Thread thread = new Thread() {
@@ -262,6 +272,7 @@ public class Firebase {
         }
     }
 
+    //Recoge las Mejoras por Usuario del usuario activo y lo guarda en room
     public static void cargarMejorasPorUsuario(Context context) {
         db = FirebaseFirestore.getInstance();
         Thread thread = new Thread() {

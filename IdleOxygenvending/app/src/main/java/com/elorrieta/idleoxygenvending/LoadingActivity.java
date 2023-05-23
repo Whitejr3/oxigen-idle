@@ -6,10 +6,8 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.elorrieta.idleoxygenvending.Database.Firebase;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -79,10 +77,7 @@ public class LoadingActivity extends AppCompatActivity {
                 }
             }.start();
         } else {
-            gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(getString(R.string.default_web_client_id))
-                    .requestEmail()
-                    .build();
+            gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
             gsc = GoogleSignIn.getClient(this, gso);
 
             findViewById(R.id.google_sign).setOnClickListener(new View.OnClickListener() {
@@ -110,6 +105,8 @@ public class LoadingActivity extends AppCompatActivity {
         }
     }
 
+    /*Al hacer click en el boton para iniciar sesión, lanza este metodo que genera el intent a la ventana para
+     * selecionar una cuenta de google play*/
     private void signIn() {
         Intent signInIntent = gsc.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -139,36 +136,33 @@ public class LoadingActivity extends AppCompatActivity {
         }
     }
 
-    /*//*Esta funcion comprueba si el usuario a inciado la sesion correctamente,si ha fallado o si la ha cancelado
+    /*Esta funcion comprueba si el usuario a inciado la sesion correctamente,si ha fallado o si la ha cancelado
      *Si ha fallado no hace nada
      *Si la ha cancelado llama a saveData con los parametros "" y false
      *Si ha iniciado sesion correctamente llama a saveData con los parametros correo de la cuenta y true*/
     private void firebaseAuthWithGoogle(String idToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        mAuth.signInWithCredential(credential)
-                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                    @Override
-                    public void onSuccess(AuthResult authResult) {
-                        Log.d(TAG, "signInWithCredential:success");
-                        FirebaseUser user = mAuth.getCurrentUser();
-                        Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
-                        intent.putExtra(getString(R.string.firstLogin), "true");
-                        startActivity(intent);
-                        finish();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Log.w(TAG, "signInWithCredential:failure", task.getException());
-                    }
-                })
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCredential:unsuccessful");
-                    }
-                });
+        mAuth.signInWithCredential(credential).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+            @Override
+            public void onSuccess(AuthResult authResult) {
+                Log.d(TAG, "signInWithCredential:success");
+                FirebaseUser user = mAuth.getCurrentUser();
+                Intent intent = new Intent(LoadingActivity.this, MainActivity.class);
+                intent.putExtra(getString(R.string.firstLogin), "true");
+                startActivity(intent);
+                finish();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Log.w(TAG, "signInWithCredential:failure", task.getException());
+            }
+        }).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                Log.d(TAG, "signInWithCredential:unsuccessful");
+            }
+        });
 
     }
 

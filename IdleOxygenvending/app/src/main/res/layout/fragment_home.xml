@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
+    tools:context=".ui.home.HomeFragment"
+    android:background="@color/blue_background">
 
     <ImageButton
         android:id="@+id/iBClicker"
@@ -24,8 +25,8 @@
         android:layout_height="58dp"
         android:layout_marginBottom="112dp"
         android:gravity="center"
-        android:text="tVOxygen"
-        android:textColor="?attr/colorPrimary"
+        android:text="@string/inicio_tv_o2"
+        android:textColor="@color/text_color"
         android:textSize="25sp"
         app:autoSizeMaxTextSize="100sp"
         app:autoSizeMinTextSize="25sp"

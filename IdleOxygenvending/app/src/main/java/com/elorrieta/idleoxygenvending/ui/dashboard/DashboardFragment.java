@@ -1,11 +1,10 @@
 package com.elorrieta.idleoxygenvending.ui.dashboard;
 
-import android.os.Build;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,6 +25,9 @@ public class DashboardFragment extends Fragment {
     private FragmentDashboardBinding binding;
     private LinearLayout linearLayout;
 
+    //Genere el layout de Mejoras, generadando las mejoras de forma dinamica con los datos de las relaciones
+    //Al mejorar se comprueba que tiene el 02 necesario si tiene el nivel aumenta, se guarda en room y se actualizan los datos en la pantalla
+    @SuppressLint("ResourceAsColor")
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         DashboardViewModel dashboardViewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
@@ -40,26 +42,32 @@ public class DashboardFragment extends Fragment {
             ImageView imageView = new ImageView(root.getContext());
             TextView nombre = new TextView(root.getContext());
             nombre.setLayoutParams(layout.getChildAt(1).getLayoutParams());
+            nombre.setTextColor(R.color.text_color);
+            //nombre.setTextColor(layout.getChildAt(1).getSolidColor());
             nombre.setText(MainActivity.mejoras.get(i).getNombre());
             TextView precio = new TextView(root.getContext());
             precio.setLayoutParams(layout.getChildAt(2).getLayoutParams());
-
+            precio.setTextColor(R.color.text_color);
             TextView nivel = new TextView(root.getContext());
+            nivel.setTextColor(R.color.text_color);
             nivel.setLayoutParams(layout.getChildAt(3).getLayoutParams());
             if (MainActivity.mejorasDelUsuario.size() != 0) {
                 precio.setText(MainActivity.mejoras.get(i).showPrice(i));
                 nivel.setText(String.valueOf(MainActivity.mejorasDelUsuario.get(i).getUpgrade_Amount()));
             } else {
-                nivel.setText("0");
-                precio.setText("Desconocido");
+                //Si no estan bien cargados los datos de las mejoras por usuario para que no hayan valores nulos
+                nivel.setText(R.string.mejoras_nivel_null);
+                precio.setText(R.string.mejoras_precio_null);
 
             }
             TextView o2ps = new TextView(root.getContext());
             o2ps.setLayoutParams(layout.getChildAt(4).getLayoutParams());
             o2ps.setText(MainActivity.mejoras.get(i).showO2psTotal(i));
+            o2ps.setTextColor(R.color.text_color);
             Button button = new Button(layout1.getContext());
             button.setLayoutParams(layout.getChildAt(5).getLayoutParams());
             button.setText(MainActivity.mejoras.get(i).showO2ps());
+            button.setBackgroundColor(R.color.green_base);
             final int finalI = i;
             button.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoadingActivity">
+    tools:context=".LoadingActivity"
+    android:background="@color/blue_background">
 
 
     <ProgressBar
@@ -22,6 +23,7 @@
         android:id="@+id/google_sign"
         android:layout_width="169dp"
         android:layout_height="55dp"
+
         android:backgroundTint="?android:attr/colorPrimary"
         android:text="Google"
         app:layout_constraintBottom_toBottomOf="parent"

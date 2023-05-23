@@ -18,6 +18,8 @@ public class MejoraPorUser {
 
     int Upgrade_Amount;
 
+
+    //Constructores
     public MejoraPorUser() {
     }
 
@@ -34,7 +36,7 @@ public class MejoraPorUser {
         this.Upgrade_Amount = Integer.parseInt(document.get(context.getString(R.string.firebase_nivel_mejoraporusuario)).toString());
     }
 
-
+    //Getters y Setters
     public int getIdUsuario() {
         return IdUsuario;
     }
@@ -59,6 +61,8 @@ public class MejoraPorUser {
         Upgrade_Amount = upgrade_Amount;
     }
 
+
+    //Carga los datos de room en una lista que esta en el main
     public static void cargarDatos(Context context) {
         AppDatabase room = AppDatabase.getDatabase(context);
         List<MejoraPorUser> mejoraPorUserList = room.mejoraPorUsuarioDao().getAll();

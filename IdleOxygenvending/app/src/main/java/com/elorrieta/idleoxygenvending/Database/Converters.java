@@ -3,7 +3,8 @@ package com.elorrieta.idleoxygenvending.Database;
 import androidx.room.TypeConverter;
 
 import java.util.Date;
-
+//Convierte el tipo de dato Date ya que Room no lo detecta
+//Date se convierte en un long para guardarlo en Room y al sacarlo pasa de long a Date
 public class Converters {
 
     @TypeConverter

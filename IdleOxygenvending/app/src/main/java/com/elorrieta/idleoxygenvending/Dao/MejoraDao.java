@@ -10,7 +10,8 @@ import com.elorrieta.idleoxygenvending.Entities.Mejora;
 
 
 import java.util.List;
-
+//Gestion de datos entre Room y la app
+//insert, delete, update y select de las mejoras.
 @Dao
 public interface MejoraDao {
 

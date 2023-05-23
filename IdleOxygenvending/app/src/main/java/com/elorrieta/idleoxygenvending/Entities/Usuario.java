@@ -36,6 +36,7 @@ public class Usuario {
     int prestige_points;
 
 
+    //Constructores
     public Usuario(int id, int oxygenQuantity, String email, Date last_conn_time, int prestige_lvl, int prestige_points) {
         this.id = id;
         this.email = email;
@@ -45,7 +46,6 @@ public class Usuario {
         this.prestige_points = prestige_points;
 
     }
-
     @Ignore
     public Usuario() {
         this.id = -1;
@@ -61,6 +61,7 @@ public class Usuario {
         this.prestige_points = Integer.parseInt(document.get(context.getString(R.string.firebase_prestige_points_usuario)).toString());
     }
 
+    //Getters y Setters
     public int getId() {
         return id;
     }
@@ -78,16 +79,6 @@ public class Usuario {
             this.oxygenQuantity += oxygenQuantity;
         }
 
-    }
-
-    public String showOxygenQuantity() {
-        String oxygenQuantity;
-        if (MainActivity.user != null) {
-            oxygenQuantity = "O2: " + (float) MainActivity.user.getOxygenQuantity() / 1000;
-        } else {
-            return "Desconocido";
-        }
-        return oxygenQuantity;
     }
 
     public String getEmail() {
@@ -122,16 +113,15 @@ public class Usuario {
         this.prestige_points = prestige_points;
     }
 
-    @Override
-    public String toString() {
-        return "Usuario{" +
-                "id=" + id +
-                ", oxygenQuantity=" + oxygenQuantity +
-                ", email='" + email + '\'' +
-                ", last_conn_time=" + last_conn_time +
-                ", prestige_lvl=" + prestige_lvl +
-                ", prestige_points=" + prestige_points +
-                '}';
+    //Muestra en 02 que tiene el usuario con un formato
+    public String showOxygenQuantity() {
+        String oxygenQuantity;
+        if (MainActivity.user != null) {
+            oxygenQuantity = "O2: " + (float) MainActivity.user.getOxygenQuantity() / 1000;
+        } else {
+            return "Desconocido";
+        }
+        return oxygenQuantity;
     }
 
     //Crea una cuenta nueva en caso de que no exista ninguna ya con ese correo
@@ -158,6 +148,8 @@ public class Usuario {
 
     }
 
+
+    //Calcula el 02 que generan todas las mejoras y lo devuelve en forma de int
     public int getO2ps(){
         int result =-1;
         if(MainActivity.mejorasDelUsuario!=null){

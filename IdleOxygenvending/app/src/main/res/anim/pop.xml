@@ -8,6 +8,4 @@
     android:pivotY="50%"
     android:toYScale="1.2"
     android:duration="100"/>
-
-
 </set>

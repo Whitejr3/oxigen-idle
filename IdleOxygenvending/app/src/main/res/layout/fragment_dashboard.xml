@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.dashboard.DashboardFragment">
+    tools:context=".ui.dashboard.DashboardFragment"
+    android:background="@color/blue_background">
 
     <ScrollView
         android:id="@+id/mejoras_scroll"
@@ -37,6 +38,7 @@
                     android:layout_height="119dp"
                     android:layout_marginStart="4dp"
                     android:src="@drawable/tree"
+                    android:contentDescription="@string/mejoras_iv_desc"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -48,7 +50,8 @@
                     android:layout_height="51dp"
                     android:layout_marginStart="144dp"
                     android:layout_marginTop="16dp"
-                    android:text="Nombre"
+                    android:textColor="@color/text_color"
+                    android:text="@string/mejoras_nombre"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -58,7 +61,8 @@
                     android:layout_height="94dp"
                     android:layout_marginStart="140dp"
                     android:layout_marginBottom="24dp"
-                    android:text="Precio"
+                    android:textColor="@color/text_color"
+                    android:text="@string/mejoras_precio"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />
 
@@ -68,7 +72,8 @@
                     android:layout_height="25dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="48dp"
-                    android:text="Nivel"
+                    android:textColor="@color/text_color"
+                    android:text="@string/mejoras_nivel"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -77,7 +82,8 @@
                     android:layout_width="103dp"
                     android:layout_height="55dp"
                     android:layout_marginEnd="4dp"
-                    android:text="02ps"
+                    android:textColor="@color/text_color"
+                    android:text="@string/mejoras_o2ps"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -86,10 +92,10 @@
                 <Button
                     android:id="@+id/BtnMejora"
                     android:layout_width="134dp"
-                    android:layout_height="42dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="32dp"
                     android:layout_marginBottom="16dp"
-                    android:text="Mejora"
+                    android:text="@string/mejoras_btn_mejora"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>

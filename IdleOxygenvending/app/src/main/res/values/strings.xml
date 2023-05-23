@@ -35,4 +35,13 @@
     <string name="firebase_o2ps_mejora">o2ps</string>
     <string name="firebase_baseprice_mejora">baseprice</string>
     <string name="mejoras_btn_text">mejorar</string>
+    <string name="mejoras_precio_null">Desconocido</string>
+    <string name="mejoras_nivel_null">0</string>
+    <string name="mejoras_nombre">Nombre</string>
+    <string name="mejoras_precio">Precio</string>
+    <string name="mejoras_nivel">Nivel</string>
+    <string name="mejoras_o2ps">02ps</string>
+    <string name="mejoras_btn_mejora">Mejora</string>
+    <string name="mejoras_iv_desc">Icono de la Mejora</string>
+    <string name="inicio_tv_o2">tVOxygen</string>
 </resources>
