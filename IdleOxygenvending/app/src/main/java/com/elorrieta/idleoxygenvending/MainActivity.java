@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 do {
+                    MejoraPorUser.cargarDatos(getApplicationContext());
                     int o2ps = 0;
                     if (mejorasDelUsuario != null) {
                         for (int i = 0; i < mejorasDelUsuario.size(); i++) {

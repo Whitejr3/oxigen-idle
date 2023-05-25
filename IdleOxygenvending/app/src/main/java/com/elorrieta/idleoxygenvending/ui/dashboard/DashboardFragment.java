@@ -15,6 +15,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.elorrieta.idleoxygenvending.Database.AppDatabase;
 import com.elorrieta.idleoxygenvending.Entities.MejoraPorUser;
 import com.elorrieta.idleoxygenvending.MainActivity;
 import com.elorrieta.idleoxygenvending.R;
@@ -74,8 +75,10 @@ public class DashboardFragment extends Fragment {
                 public void onClick(View v) {
 
                     if(MainActivity.user.getOxygenQuantity()>=MainActivity.mejoras.get(finalI).getPrice(finalI)){
+                        AppDatabase room = AppDatabase.getDatabase(getContext());
                         MainActivity.user.setOxygenQuantity(-MainActivity.mejoras.get(finalI).getPrice(finalI));
                         MainActivity.mejorasDelUsuario.get(finalI).setUpgrade_Amount(MainActivity.mejorasDelUsuario.get(finalI).getUpgrade_Amount()+1);
+                        room.mejoraPorUsuarioDao().update(MainActivity.mejorasDelUsuario.get(finalI).getIdUsuario(), MainActivity.mejorasDelUsuario.get(finalI).getIdMejora(), MainActivity.mejorasDelUsuario.get(finalI).getUpgrade_Amount());
                         nivel.setText(String.valueOf(MainActivity.mejorasDelUsuario.get(finalI).getUpgrade_Amount()));
                         precio.setText(MainActivity.mejoras.get(finalI).showPrice(finalI));
                         o2ps.setText(MainActivity.mejoras.get(finalI).showO2psTotal(finalI));
